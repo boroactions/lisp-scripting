@@ -1,0 +1,30 @@
+name: Test
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check Out Everything
+        uses: actions/checkout@v2
+      - name: Install Lisp
+        uses: borodust/lisp@v0
+        with:
+          lisp: sbcl_ros
+      - name: Install Lisp Scripting
+        uses: borodust/lisp-scripting@v0
+        with:
+          lisp: ${{ env.LISP }}
+      - name: Test Lisp Scripting
+        run: |
+          echo '#!/usr/bin/env lisps
+          (bind-arguments name &key additional)
+          (shout "Hello, ~@[~A ~]~A!" additional name)
+          (shout "From ~A" *script-path*)
+          ' > /tmp/run.sh \
+          && chmod +x /tmp/run.sh \
+          && /tmp/run.sh --additional Lispin World
+        shell: bash

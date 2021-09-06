@@ -1,0 +1,21 @@
+name: 'Common Lisp Shell Scripting'
+description: 'Allows using Lisp code with shebang pointing to Common Lisp implementation.'
+inputs:
+  lisp:
+    description: |
+      Path to Common Lisp implementation executable. Supported implementations: SBCL, CCL and ECL.
+    required: true
+outputs:
+  lisps:
+    description: "Link to executable for use in shebang string"
+    value: ${{ steps.output.lisps }}
+runs:
+  using: "composite"
+  steps:
+    - run: echo "LISPS=/usr/local/bin/lisps" >> $GITHUB_ENV
+      shell: sh
+    - run: ${{ github.action_path }}/install-lisp-script.sh ${{ inputs.lisp }} "$LISPS"
+      shell: sh
+    - id: output
+      run: echo "::set-output name=lisps::$LISPS"
+      shell: sh
