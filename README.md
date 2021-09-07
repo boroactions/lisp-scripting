@@ -1,6 +1,6 @@
-![tests](https://github.com/borodust/lisp-scripting/actions/workflows/test.yaml/badge.svg)
+![tests](https://github.com/boroactions/lisp-scripting/actions/workflows/test.yaml/badge.svg)
 
-# borodust/lisp-scripting@v0
+# boroactions/lisp-scripting@v0
 
 This GitHub action allows using Common Lisp in shell scripts with shebang:
 ```sh

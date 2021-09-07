@@ -11,11 +11,11 @@ jobs:
       - name: Check Out Everything
         uses: actions/checkout@v2
       - name: Install Lisp
-        uses: borodust/lisp@v0
+        uses: boroactions/lisp@v0
         with:
           lisp: sbcl_ros
       - name: Install Lisp Scripting
-        uses: borodust/lisp-scripting@v0
+        uses: boroactions/lisp-scripting@v0
         with:
           lisp: ${{ env.LISP }}
       - name: Test Lisp Scripting
