@@ -74,10 +74,25 @@
           last))))
 
 
+(defmacro with-temporary-directory ((&key pathname) &body body)
+  (let ((tmp-file (gensym))
+        (tmp-dir (gensym)))
+    `(uiop:with-temporary-file (:pathname ,tmp-file)
+       (let* ((,tmp-dir (merge-pathnames (format nil "~A.dir/" (pathname-name ,tmp-file))
+                                         (uiop:pathname-directory-pathname ,tmp-file)))
+              ,@(when pathname
+                  `((,pathname ,tmp-dir))))
+         (unwind-protect
+              (progn
+                (ensure-directories-exist ,tmp-dir)
+                ,@body)
+           (uiop:delete-directory-tree ,tmp-dir :validate (constantly t)))))))
+
+
 (defmacro bind-arguments (&body params)
   (multiple-value-bind (optional keys)
       (loop for (param . rest) on params
-            until (string= param '&key)
+            until (and (atom param) (string= param '&key))
             collect param into optional-params
             finally (return (values optional-params rest)))
     (multiple-value-bind (args value-map)
@@ -105,8 +120,10 @@
               finally (return (values values value-map)))
       `(progn ,@(loop for opt in optional
                       for rest-args = args then (rest rest-args)
-                      collect `(defparameter ,opt
-                                 ,(first rest-args)))
+                      collect (destructuring-bind (name &optional default-value)
+                                  (uiop:ensure-list opt)
+                                `(defparameter ,name
+                                   ,(or (first rest-args) default-value))))
               ,@(loop for key in keys
                       append (destructuring-bind (&optional full-name
                                                     default-value
@@ -122,14 +139,20 @@
                                      ,@(when provided-p
                                          `((defparameter ,provided-p ,found-p))))))))))))
 
-(defvar *supress-errors* nil)
-(defvar *shell-output* nil)
-(defvar *return-code-on-error* nil)
+
+(defparameter *supress-errors* nil)
+(defparameter *trim-output* t)
+(defparameter *shell-output* nil)
+
+
+(define-condition shell-command-error (serious-condition)
+  ((code :initarg :code)))
 
 
 (defmacro return-code-on-error (&body body)
-  `(let ((*return-code-on-error* t))
-     ,@body))
+  `(handler-case
+       (progn ,@body)
+     (shell-command-error (e) (slot-value e 'code))))
 
 
 (defun $ (&rest args)
@@ -148,10 +171,10 @@
                                     :ignore-error-status t)
         (declare (ignore err))
         (if (= code 0)
-            std
-            (if *return-code-on-error*
-                code
-                (error "Shell command `~A` returned non-zero code (~A)" command code)))))))
+            (if *trim-output*
+                (trim std)
+                std)
+            (make-condition 'shell-command-error :code code))))))
 
 
 (defun read-safely (string)
