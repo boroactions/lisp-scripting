@@ -12,9 +12,14 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: borodust/lisp-scripts
+        ref: b39535fb1f38b492c9c569574cc16e2a14a469d4
+        path: ${{ github.workspace }}/.boroactions-lisp-scripting/
     - run: echo "LISPS=/usr/local/bin/lisps" >> $GITHUB_ENV
       shell: sh
-    - run: ${{ github.action_path }}/install-lisp-script.sh ${{ inputs.lisp }} "$LISPS"
+    - run: ${{ github.workspace }}/.boroactions-lisp-scripting/lisps/install-lisp-script.sh ${{ inputs.lisp }} "$LISPS"
       shell: sh
     - id: output
       run: echo "::set-output name=lisps::$LISPS"

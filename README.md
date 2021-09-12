@@ -9,12 +9,4 @@ This GitHub action allows using Common Lisp in shell scripts with shebang:
 (print 'hello)
 ```
 
-SBCL, CCL and ECL are supported as host environments for scripting.
-
-## Installation
-
-You can use this utility for scripting on your personal machine too:
-```sh
-# if /usr/local/bin/ is in PATH and writable by a user
-./install-lisp-script.sh sbcl /usr/local/bin/lisps
-```
+See [borodust/lisp-scripts](https://github.com/borodust/lisp-scripts/lisps/) for further details.
