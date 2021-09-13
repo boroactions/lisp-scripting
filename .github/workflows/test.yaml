@@ -28,3 +28,6 @@ jobs:
           && chmod +x /tmp/run.sh \
           && /tmp/run.sh --additional Lispin World
         shell: bash
+      - name: Test Lisp Script
+        run: ensure-quicklisp
+        shell: sh
