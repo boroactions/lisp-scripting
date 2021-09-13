@@ -5,6 +5,9 @@ inputs:
     description: |
       Path to Common Lisp implementation executable. Supported implementations: SBCL, CCL and ECL.
     required: true
+  lisp-scripting-ref:
+    required: true
+    default: b39535fb1f38b492c9c569574cc16e2a14a469d4
 outputs:
   lisps:
     description: "Link to executable for use in shebang string"
@@ -12,14 +15,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - run: echo "LISP_SCRIPTING_DIR=${{ github.workspace }}/.borodust/lisp-scripting/${{ inputs.lisp-scripting-ref }}/" >> $GITHUB_ENV
+      shell: sh
     - uses: actions/checkout@v2
       with:
         repository: borodust/lisp-scripts
-        ref: b39535fb1f38b492c9c569574cc16e2a14a469d4
-        path: ${{ github.workspace }}/.boroactions-lisp-scripting/
+        ref: ${{ inputs.lisp-scripting-ref }}
+        path: ${{ env.LISP_SCRIPTING_DIR }}
     - run: echo "LISPS=/usr/local/bin/lisps" >> $GITHUB_ENV
       shell: sh
-    - run: ${{ github.workspace }}/.boroactions-lisp-scripting/lisps/install-lisp-script.sh ${{ inputs.lisp }} "$LISPS"
+    - run: ${{ env.LISP_SCRIPTING_DIR }}/lisps/install-lisp-script.sh ${{ inputs.lisp }} "$LISPS"
+      shell: sh
+    - run: echo "${{ env.LISP_SCRIPTING_DIR }}/" >> $GITHUB_PATH
       shell: sh
     - id: output
       run: echo "::set-output name=lisps::$LISPS"
