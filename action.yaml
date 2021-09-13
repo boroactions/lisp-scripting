@@ -7,7 +7,7 @@ inputs:
     required: true
   lisp-scripting-ref:
     required: true
-    default: b39535fb1f38b492c9c569574cc16e2a14a469d4
+    default: f254592b5a4cccd7da8cb5beb4be157817745e28
 outputs:
   lisps:
     description: "Link to executable for use in shebang string"
