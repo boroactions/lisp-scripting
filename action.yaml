@@ -11,7 +11,7 @@ inputs:
 outputs:
   lisps:
     description: "Link to executable for use in shebang string"
-    value: ${{ steps.output.lisps }}
+    value: ${{ steps.output.outputs.lisps }}
 runs:
   using: "composite"
   steps:
